@@ -15,6 +15,7 @@ export { Views } from './views/views'
 export { Cache } from './cache'
 export { Provider } from './provider'
 export { Dispatcher } from './dispatcher'
+export { Container } from './container'
 
 // Support
 export { errorHandler, notFoundHandler } from './error-handler'

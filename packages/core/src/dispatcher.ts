@@ -1,6 +1,7 @@
 import { Injectable } from './decorators/injectable'
 import { Container } from './container'
 import { Constructable } from './types'
+import { Autoload } from './autoload'
 
 export interface IDispatcher {
     handle(...args: any[]): Promise<any> | any
@@ -23,14 +24,35 @@ export class Dispatcher {
         const handler = this.getHandler(cls)
         const resolved = this.container.resolve(handler)
 
-        if(typeof cls.validate === 'function') {
+        if (typeof cls.validate === 'function') {
             cls.validate()
         }
 
         return resolved.handle(cls)
     }
 
+    mapHandlers(commandsPath: string, handlersPath: string) {
+        const commands = Autoload.load(commandsPath)
+        const handlers = Autoload.load(handlersPath)
+
+        Object.keys(commands).forEach(commandName => {
+            const handler = handlers[commandName + 'Handler']
+
+            if (!handler) {
+                throw new Error('No handler defined for command: ' + commandName)
+            }
+
+            this.register(commands[commandName], handlers[commandName + 'Handler'])
+        })
+    }
+
     private getHandler(command: any): Constructable {
-        return this.handlers.get(command.constructor.name)
+        const handler = this.handlers.get(command.constructor.name)
+
+        if (!handler) {
+            throw new Error('No handler registered for command: ' + command.constructor.name)
+        }
+
+        return handler
     }
 }

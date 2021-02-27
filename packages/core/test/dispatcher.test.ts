@@ -1,5 +1,7 @@
 import * as assert from 'assert'
 import { Container, Dispatcher } from '../src'
+import { TestCommand } from './commands/test-command'
+import { TestCommandHandler } from './handlers/test-command-handler'
 
 let container: Container = null
 
@@ -16,32 +18,21 @@ describe('Dispatcher', () => {
 
     it('should dispatch an action', async () => {
         const dispatcher = container.resolve(Dispatcher)
-        const value = await dispatcher.dispatch(new DummyAction(10))
-        assert(value === '10 changed')
+        dispatcher.register(TestCommand, TestCommandHandler)
+        const value = await dispatcher.dispatch(new TestCommand(10))
+        assert(value === '10 handled')
     })
 
     it('should fail dispatching an action', async () => {
         const dispatcher = container.resolve(Dispatcher)
-        await assert.rejects(async () => dispatcher.dispatch(new DummyWrongHandler(10) as any))
+        dispatcher.register(TestCommand, TestCommandHandler)
+        assert.rejects(() => dispatcher.dispatch(new TestCommand('should fail')))
+    })
+
+    it('should map commands to handlers', async () => {
+        const dispatcher = container.resolve(Dispatcher)
+        dispatcher.mapHandlers(__dirname + '/commands', __dirname + '/handlers')
+        const value = await dispatcher.dispatch(new TestCommand(10))
+        assert(value === '10 handled')
     })
 })
-
-class DummyAction {
-    public id: number
-
-    constructor(id: number) {
-        this.id = id
-    }
-
-    handle() {
-        return this.id + ' changed'
-    }
-}
-
-class DummyWrongHandler {
-    public id: number
-
-    constructor(id: number) {
-        this.id = id
-    }
-}

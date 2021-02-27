@@ -36,7 +36,7 @@ export class Router {
     routes: IRouteDefinition[]
     middleware: Middleware []
     classMiddleware: any[]
-    statics: any[]
+    statics: any
     groupMiddleware: Middleware[]
     container: Container
     app: Express
@@ -59,8 +59,13 @@ export class Router {
         this.classMiddleware.push(cls)
     }
 
-    static(path) {
-        this.statics.push(path)
+    static(route: string, path?: string) {
+        if (!path) {
+            path = route
+            this.statics.push(path)
+        } else {
+            this.statics.push([route, path])
+        }
     }
 
     controller(cls: Constructable) {
@@ -103,7 +108,11 @@ export class Router {
         // Early binding, public asset queries will fall through
         // all other routes and middleware
         this.statics.forEach(path => {
-            this.app.use(express.static(path))
+            if(Array.isArray(path)) {
+                this.app.use(path[0], express.static(path[1]))
+            } else {
+                this.app.use(express.static(path))
+            }
         })
 
         this.app.use(expressRouter)

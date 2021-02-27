@@ -65,8 +65,8 @@ export class App extends Container {
         this.hooks.push(fn)
     }
 
-    static(path) {
-        this.resolve(Router).static(path)
+    static(route: string, path?: string) {
+        this.resolve(Router).static(route, path)
     }
 
     basePath(given) {

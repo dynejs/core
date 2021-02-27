@@ -1,0 +1,35 @@
+{
+    "name": "@dynejs/db",
+    "version": "0.1.0",
+    "main": "./dist/index.js",
+    "dependencies": {
+        "knex": "^0.21.5",
+        "mysql": "^2.18.1",
+        "sqlite3": "^5.0.0",
+        "uuid": "^3.4.0"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc -w",
+        "test": "cross-env NODE_ENV=test mocha --require ts-node/register  --watch-extensions ts 'test/**/db.test.ts' --exit",
+        "test:db": "cross-env NODE_ENV=test ts-node ./test/migrate.ts --dir ./test/tsconfig.json"
+    },
+    "bugs": {
+        "url": "https://github.com/dynejs/db/issues",
+        "email": "iamzozo@gmail.com"
+    },
+    "homepage": "https://github.com/dynejs/db",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dynejs/db.git"
+    },
+    "types": "./types/index.d.ts",
+    "license": "MIT",
+    "files": [
+        "dist",
+        "types"
+    ],
+    "devDependencies": {
+        "cross-env": "^7.0.3"
+    }
+}

@@ -1,0 +1,1 @@
+export { validate, Validator } from './validate'

@@ -1,0 +1,27 @@
+{
+    "name": "@dynejs/validation",
+    "version": "0.1.0",
+    "main": "./dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc -w",
+        "test": "cross-env NODE_ENV=test mocha 'test/*.test.js' --exit"
+    },
+    "peerDependencies": {
+        "lodash.get": "4.x",
+        "cross-env": "7.x"
+    },
+    "bugs": {
+        "url": "https://github.com/dynejs/core/issues",
+        "email": "iamzozo@gmail.com"
+    },
+    "homepage": "https://github.com/dynejs/core",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dynejs/core.git"
+    },
+    "license": "MIT",
+    "files": [
+        "dist"
+    ]
+}

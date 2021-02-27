@@ -1,0 +1,36 @@
+{
+    "name": "@dynejs/mail",
+    "version": "0.1.0",
+    "main": "./dist/index.js",
+    "dependencies": {
+        "nodemailer": "^6.4.16",
+        "inline-css": "^3.0.0"
+    },
+    "devDependencies": {
+        "@types/express": "^4.17.6",
+        "@types/mocha": "^7.0.2",
+        "@types/node": "^14.0.5",
+        "cross-env": "^7.0.3",
+        "mocha": "^7.1.2",
+        "ts-node": "^8.10.2",
+        "typescript": "^3.9.5"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc -w",
+        "test": "cross-env NODE_ENV=test mocha --require ts-node/register  --watch-extensions ts 'test/**/*.test.ts' --exit"
+    },
+    "bugs": {
+        "url": "https://github.com/dynejs/mail/issues",
+        "email": "iamzozo@gmail.com"
+    },
+    "homepage": "https://github.com/dynejs/mail",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/dynejs/mail.git"
+    },
+    "license": "MIT",
+    "files": [
+        "dist"
+    ]
+}

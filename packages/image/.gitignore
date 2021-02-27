@@ -1,0 +1,5 @@
+/.idea
+/node_modules
+/dist
+/test/images/**/*.png
+!/test/images/test-img.png

@@ -1,19 +1,17 @@
 import * as express from 'express'
 import * as hbs from 'hbs'
-import { Express, IRouter } from 'express'
 import * as methods from 'methods'
-import { asyncWrap } from './utils'
-
 import _debug = require('debug')
-import { Constructable, Middleware, Response, Request } from './types'
+import { Express, IRouter } from 'express'
+import { Constructable, Middleware } from './types'
 import { Container } from './container'
-import { NextFunction } from 'express'
 import { Injectable } from './decorators/injectable'
-import { errorHandler } from './error-handler'
-import { vendor } from './middleware'
 import { Views } from './views/views'
+import { asyncWrap, isClass } from './utils'
+import { vendor } from './middleware'
 import { setRenderPage } from './middleware/set-render-page'
 import { setIsJson } from './middleware/set-is-json'
+import { errorHandler } from './error-handler'
 
 const debug = _debug('dyne:core:router')
 
@@ -26,13 +24,16 @@ export interface IRouteDefinition {
     request?: Constructable
 }
 
-export interface MiddlewareHandler {
-    handle(req: Request, res: Response, next?: NextFunction): Promise<void>
-}
-
 export interface MiddlewareDef {
     path: string
-    middleware: Middleware | Constructable
+    handler: Middleware
+    cls: Constructable
+}
+
+export interface StaticDef {
+    route: string
+    path: string
+    opts: any
 }
 
 @Injectable()
@@ -40,9 +41,7 @@ export class Router {
 
     routes: IRouteDefinition[]
     middleware: MiddlewareDef[]
-    groupMiddleware: MiddlewareDef[]
-    classMiddleware: MiddlewareDef[]
-    statics: any
+    statics: StaticDef[]
     container: Container
     app: Express
 
@@ -52,48 +51,42 @@ export class Router {
         this.routes = []
         this.middleware = []
         this.statics = []
-        this.classMiddleware = []
-        this.groupMiddleware = []
     }
 
-    use(middleware: Middleware)
+    use(handler: Middleware | Constructable)
 
-    use(path: string, middleware?: Middleware)
+    use(path: string, handler?: Middleware | Constructable)
 
-    use(path, middleware?) {
-        if (!middleware && typeof path === 'function') {
-            middleware = path
+    use(path, handler?) {
+        if (!handler && typeof path === 'function') {
+            handler = path
             path = null
         }
-
-        this.middleware.push({
-            path,
-            middleware
-        })
-    }
-
-    useCls(cls: Constructable)
-
-    useCls(path: string, cls: Constructable)
-
-    useCls(path, cls?) {
-        if (!cls && typeof path === 'function') {
-            cls = path
-            path = null
+        const def: MiddlewareDef = {
+            path: path,
+            handler: null,
+            cls: null
         }
-        this.classMiddleware.push({
-            path,
-            middleware: cls
-        })
+        if (isClass(handler)) {
+            def.handler = null
+            def.cls = handler
+        } else {
+            def.handler = handler
+            def.cls = null
+        }
+        this.middleware.push(def)
     }
 
-    static(route: string, path?: string) {
+    static(route: string, path?: string, opts?: any) {
         if (!path) {
             path = route
-            this.statics.push(path)
-        } else {
-            this.statics.push([route, path])
+            route = null
         }
+        this.statics.push({
+            path,
+            route,
+            opts
+        })
     }
 
     controller(cls: Constructable) {
@@ -109,46 +102,44 @@ export class Router {
     bind(): any {
         const expressRouter = makeRouter()
 
-        this.app.use(vendor())
-        this.app.use(setIsJson())
-        this.app.use(setRenderPage())
-
         hbs.localsAsTemplateData(this.app)
         this.app.engine('hbs', hbs.__express)
         this.app.set('view engine', 'hbs')
         this.app.set('views', this.container.resolve(Views).get())
 
+        // Bind assets middleware first
+        this.statics.forEach(def => {
+            const mw = express.static(def.path, def.opts)
+            const params = def.route
+                ? [def.route, mw]
+                : [mw]
+
+            this.app.use.apply(this.app, params)
+        })
+
+        // Core middleware functions
+        this.app.use(vendor())
+        this.app.use(setIsJson())
+        this.app.use(setRenderPage())
+
+        // Bind middleware functions
         this.middleware.forEach(middleware => {
-            const handler = asyncWrap(middleware.middleware)
+            let handler = null
+            if (middleware.cls) {
+                const instance: any = this.container.resolve(middleware.cls)
+                handler = asyncWrap(instance.handle.bind(instance))
+            } else {
+                handler = asyncWrap(middleware.handler)
+            }
             const params = middleware.path
                 ? [middleware.path, handler]
                 : [handler]
             this.app.use.apply(this.app, params)
         })
 
-        this.classMiddleware.forEach(middleware => {
-            const instance: any = this.container.resolve(middleware.middleware as any)
-            const handler = asyncWrap(instance.handle.bind(instance))
-            const params = middleware.path
-                ? [middleware.path, handler]
-                : [handler]
-            this.app.use.apply(this.app, params)
-        })
-
+        // Bind routes
         this.routes.map(route => {
             expressRouter[route.method](route.path, route.middleware, route.handler)
-        })
-
-        this.app.use('/storage', express.static('storage/public'))
-
-        // Early binding, public asset queries will fall through
-        // all other routes and middleware
-        this.statics.forEach(path => {
-            if(Array.isArray(path)) {
-                this.app.use(path[0], express.static(path[1]))
-            } else {
-                this.app.use(express.static(path))
-            }
         })
 
         this.app.use(expressRouter)

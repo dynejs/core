@@ -93,14 +93,6 @@ export class App extends Container {
         this.resolve(Router).use(path, middleware)
     }
 
-    useCls(path: Constructable)
-
-    useCls(path: string, middleware?: Constructable)
-
-    useCls(path, middleware?) {
-        this.resolve(Router).useCls(path, middleware)
-    }
-
     registerCommand(command: Constructable<ICommand>) {
         this.resolve(Command).register(command)
     }

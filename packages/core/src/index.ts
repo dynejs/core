@@ -15,6 +15,7 @@ export { Provider } from './provider'
 export { Command } from './command'
 export { Dispatcher } from './dispatcher'
 export { Container } from './container'
+export { Translation } from './translation'
 
 // Decorators
 export { Service, Injectable } from './decorators/injectable'

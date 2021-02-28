@@ -32,6 +32,12 @@ export class Translation {
         return this.dictionary[path] || path
     }
 
+    add(dir: string) {
+        dir = path.resolve(dir)
+        this.config.dirs.push(path.resolve(dir))
+        this.loadDir(dir)
+    }
+
     loadDirs() {
         this.config.dirs.forEach(dir => {
             this.loadDir(path.normalize(dir))

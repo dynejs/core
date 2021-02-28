@@ -68,13 +68,9 @@ export class Image {
     }
 
     middleware() {
-        return async (req, res, next) => {
-            const match = this.regexp.exec(req.path)
-            if (!match || !Array.isArray(match)) {
-                return next()
-            }
-            const size = match[1]
-            const name = match[2]
+        return async (req, res) => {
+            const size = req.params.size
+            const name = req.params.name
             if (!name || !size) {
                 throw new Error(`Error parsing image url segments, got: ${size}, ${name}`)
             }

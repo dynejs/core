@@ -12,10 +12,10 @@ export class ImageProvider extends Provider {
             .filter(segment => segment !== '')
             .join('/')
 
-        this.app.use('/' + route, this.app.staticMiddleware(imageConfig.baseDir, {
-            maxAge: 1000000
-        }))
+        // Static storage access
+        this.app.static('/' + route, imageConfig.baseDir)
 
+        // Image generation
         this.app.use(imageConfig.url, image.middleware())
     }
 }

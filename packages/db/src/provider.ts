@@ -1,12 +1,15 @@
-import { Provider, Config } from '@dynejs/core'
+import { Provider, Config, Command } from '@dynejs/core'
 import { Connection } from './connection'
 import { Migrator } from './migrator'
+import { Migration } from './commands/migration'
 
 export class DatabaseProvider extends Provider {
 
     register() {
         this.registerConnection()
         this.registerMigrator()
+
+        this.app.resolve(Command).register(Migration)
     }
 
     registerConnection() {

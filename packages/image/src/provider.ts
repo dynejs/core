@@ -5,12 +5,17 @@ export class ImageProvider extends Provider {
 
     register() {
         const config = this.app.resolve(Config)
-        const image = new Image(config.get('image', {}))
+        const imageConfig = config.get('image', {})
+        const image = new Image(imageConfig)
+        const route = imageConfig.url.split('/')
+            .slice(0, -2)
+            .filter(segment => segment !== '')
+            .join('/')
 
-        this.app.use('/storage', this.app.staticMiddleware('storage/public', {
+        this.app.use('/' + route, this.app.staticMiddleware(imageConfig.baseDir, {
             maxAge: 1000000
         }))
 
-        this.app.use('/storage/:size/:name', image.middleware())
+        this.app.use(imageConfig.url, image.middleware())
     }
 }

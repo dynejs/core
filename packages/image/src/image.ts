@@ -3,7 +3,6 @@ import path = require('path')
 import sharp = require('sharp')
 import isImage = require('is-image')
 import ReadableStream = NodeJS.ReadableStream
-import { pathToRegexp } from 'path-to-regexp'
 
 sharp.concurrency(2)
 sharp.cache(false)
@@ -23,13 +22,11 @@ export interface ImageOpts {
 export class Image {
 
     opts: ImageOpts
-    regexp: any
     segments: any
 
     constructor(config: ImageOpts) {
         this.opts = config
         this.segments = []
-        this.regexp = pathToRegexp(this.opts.url, this.segments)
     }
 
     resize(key: string, filename: string): ReadableStream {

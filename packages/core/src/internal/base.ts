@@ -1,6 +1,6 @@
 import { Views } from '../views/views'
 import { Config } from '../config'
-import { CommandService } from '../command'
+import { Command } from '../command'
 import { Router } from '../router'
 import { Cache } from '../cache'
 import { Provider } from '../provider'
@@ -16,7 +16,7 @@ export class BaseProvider extends Provider {
         this.app.register(Config)
         this.app.register(Cache)
         this.app.register(Views)
-        this.app.register(CommandService)
+        this.app.register(Command)
         this.app.register(Router)
         this.app.register(Event)
         this.app.register(Dispatcher)

@@ -1,10 +1,10 @@
 import * as assert from 'assert'
 import 'reflect-metadata'
-import { Command } from '../src/decorators/command'
-import { CommandService, ICommand } from '../src/command'
+import { CommandHandler } from '../src/decorators/command-handler'
+import { Command, ICommand } from '../src/command'
 import { Container } from '../src'
 
-@Command('some-command')
+@CommandHandler('some-command')
 class SomeCommand implements ICommand {
     handle(opts) {
         return opts.param
@@ -12,12 +12,12 @@ class SomeCommand implements ICommand {
 }
 
 let container: Container = null
-let cnsl: CommandService = null
+let cnsl: Command = null
 
 before(() => {
     container = new Container()
-    container.register(CommandService)
-    cnsl = container.resolve(CommandService)
+    container.register(Command)
+    cnsl = container.resolve(Command)
 })
 
 describe('Console', () => {

@@ -6,17 +6,20 @@ import { Constructable, Middleware } from './types'
 import { Router } from './router'
 import { Container } from './container'
 import { Provider } from './provider'
+import { Command, ICommand } from './command'
 
 export class App extends Container {
 
-    hooks: (() => void)[]
     registeredProviders: Provider[]
     opts: any
+    hooks: (() => void)[]
+    cliHooks: ((app: App) => void)[]
 
     constructor(providers: Constructable[] = []) {
         super()
 
         this.hooks = []
+        this.cliHooks = []
         this.registeredProviders = []
         this.opts = {
             root: process.cwd()
@@ -58,7 +61,12 @@ export class App extends Container {
             this.resolve(Router).bind()
             // Run hooks
             this.hooks.map(fn => fn())
+            this.cliHooks.map(fn => fn(this))
         })
+    }
+
+    cli(callback: () => void) {
+        this.cliHooks.push(callback)
     }
 
     afterBoot(fn) {
@@ -79,6 +87,10 @@ export class App extends Container {
 
     useCls(middleware: Constructable) {
         this.resolve(Router).useCls(middleware)
+    }
+
+    registerCommand(command: Constructable<ICommand>) {
+        this.resolve(Command).register(command)
     }
 
     listen(opts: any = {}) {

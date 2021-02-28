@@ -1,7 +1,7 @@
 import * as minimist from 'minimist'
 import { Constructable } from './types'
 import { Container } from './container'
-import { COMMAND_METADATA } from './decorators/command'
+import { COMMAND_METADATA } from './decorators/command-handler'
 import { Injectable } from './decorators/injectable'
 
 export interface ICommand {
@@ -9,7 +9,7 @@ export interface ICommand {
 }
 
 @Injectable()
-export class CommandService {
+export class Command {
 
     commands: Map<string, Constructable<ICommand>>
     container: Container
@@ -37,7 +37,7 @@ export class CommandService {
     }
 
     run(args): Promise<any> {
-        args = args.split(' ') || process.argv.slice(2)
+        args = args ? args.split(' ') : process.argv.slice(2)
         const parsed = minimist(args)
 
         const command = this.get((parsed._ || [])[0])

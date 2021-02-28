@@ -19,6 +19,7 @@ export type Callback = (resolved: any) => any
 
 export class Container {
     services: Map<string, Binding<any>>
+
     //hooks: Map<string, Callback[]>
 
     constructor() {

@@ -1,6 +1,7 @@
 export { Migrator } from './migrator'
 export { Connection, ConnectConfig } from './connection'
 export { Repo } from './repo'
+export { DatabaseProvider } from './provider'
 
 export {
     hasOne,

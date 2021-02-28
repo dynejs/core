@@ -18,6 +18,7 @@
         "minimist": "^1.2.5",
         "morgan": "^1.10.0",
         "multer": "^1.4.2",
+        "reflect-metadata": "^0.1.13",
         "session-file-store": "^1.4.0",
         "slug": "^2.1.1",
         "tinydate": "^1.2.0"

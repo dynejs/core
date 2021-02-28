@@ -30,14 +30,19 @@ export interface MiddlewareHandler {
     handle(req: Request, res: Response, next?: NextFunction): Promise<void>
 }
 
+export interface MiddlewareDef {
+    path: string
+    middleware: Middleware | Constructable
+}
+
 @Injectable()
 export class Router {
 
     routes: IRouteDefinition[]
-    middleware: Middleware []
-    classMiddleware: any[]
+    middleware: MiddlewareDef[]
+    groupMiddleware: MiddlewareDef[]
+    classMiddleware: MiddlewareDef[]
     statics: any
-    groupMiddleware: Middleware[]
     container: Container
     app: Express
 
@@ -51,12 +56,35 @@ export class Router {
         this.groupMiddleware = []
     }
 
-    use(middleware: Middleware) {
-        this.middleware.push(middleware)
+    use(middleware: Middleware)
+
+    use(path: string, middleware?: Middleware)
+
+    use(path, middleware?) {
+        if (!middleware && typeof path === 'function') {
+            middleware = path
+            path = null
+        }
+
+        this.middleware.push({
+            path,
+            middleware
+        })
     }
 
-    useCls(cls: Constructable) {
-        this.classMiddleware.push(cls)
+    useCls(cls: Constructable)
+
+    useCls(path: string, cls: Constructable)
+
+    useCls(path, cls?) {
+        if (!cls && typeof path === 'function') {
+            cls = path
+            path = null
+        }
+        this.classMiddleware.push({
+            path,
+            middleware: cls
+        })
     }
 
     static(route: string, path?: string) {
@@ -91,12 +119,20 @@ export class Router {
         this.app.set('views', this.container.resolve(Views).get())
 
         this.middleware.forEach(middleware => {
-            this.app.use(asyncWrap(middleware))
+            const handler = asyncWrap(middleware.middleware)
+            const params = middleware.path
+                ? [middleware.path, handler]
+                : [handler]
+            this.app.use.apply(this.app, params)
         })
 
-        this.classMiddleware.forEach(cls => {
-            const instance: any = this.container.resolve(cls)
-            this.app.use(asyncWrap(instance.handle.bind(instance)))
+        this.classMiddleware.forEach(middleware => {
+            const instance: any = this.container.resolve(middleware.middleware as any)
+            const handler = asyncWrap(instance.handle.bind(instance))
+            const params = middleware.path
+                ? [middleware.path, handler]
+                : [handler]
+            this.app.use.apply(this.app, params)
         })
 
         this.routes.map(route => {

@@ -1,5 +1,5 @@
-import * as express from 'express'
 import * as path from 'path'
+import * as express from 'express'
 import { Server as HttpServer } from 'http'
 import { BaseProvider } from './internal/base'
 import { Constructable, Middleware } from './types'
@@ -77,16 +77,28 @@ export class App extends Container {
         this.resolve(Router).static(route, path)
     }
 
+    staticMiddleware(...args) {
+        return express.static.apply(null, args)
+    }
+
     basePath(given) {
         return path.resolve(path.join(this.opts.root, given))
     }
 
-    use(middleware: Middleware) {
-        this.resolve(Router).use(middleware)
+    use(path: Middleware)
+
+    use(path: string, middleware?: Middleware)
+
+    use(path, middleware?) {
+        this.resolve(Router).use(path, middleware)
     }
 
-    useCls(middleware: Constructable) {
-        this.resolve(Router).useCls(middleware)
+    useCls(path: Constructable)
+
+    useCls(path: string, middleware?: Constructable)
+
+    useCls(path, middleware?) {
+        this.resolve(Router).useCls(path, middleware)
     }
 
     registerCommand(command: Constructable<ICommand>) {

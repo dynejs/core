@@ -30,8 +30,7 @@
     "scripts": {
         "build": "tsc",
         "dev": "tsc -w",
-        "test": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/application.ts' --exit",
-        "test:db": "ts-node ./test/migrate.ts --dir ./test/tsconfig.json"
+        "test": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/*.test.ts' --exit"
     },
     "bugs": {
         "url": "https://github.com/dynejs/core/issues",

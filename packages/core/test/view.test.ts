@@ -19,10 +19,10 @@ describe('View', () => {
         assert(typeof hbs.handlebars.helpers.helperFn === 'function')
     })
 
-    it('should render a view', function () {
+    it('should render a view', async () => {
         const views = new Views()
         views.add(__dirname + '/views')
-        const content = views.render('test', {world: 'WORLD'})
+        const content = await views.render('test', {world: 'WORLD'})
         assert(content.startsWith('Hello WORLD'))
     })
 })

@@ -1,16 +1,17 @@
 import crypto = require('crypto')
 import path = require('path')
 import fs = require('fs')
+import { Config } from './config'
+import { Injectable } from './decorators/injectable'
 
+@Injectable()
 export class Cache {
 
     dir: any
     opts: any
 
-    constructor() {
-        this.opts = {
-            disabled: false
-        }
+    constructor(config: Config) {
+        this.opts = config.get('cache', {})
         this.dir = path.join(process.cwd(), 'storage/cache')
     }
 

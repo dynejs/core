@@ -1,8 +1,4 @@
 import { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express'
-import { Config } from './config'
-import { Views } from './views/views'
-import { Cache } from './cache'
-import { Translation } from './translation'
 
 export type Middleware = (req: Request, res: Response, next?: NextFunction) => void
 
@@ -25,9 +21,6 @@ export interface Response extends ExpressResponse {
     success: (result: any) => void
 }
 
-export interface BaseServices {
-    config: Config
-    views: Views
-    cache: Cache
-    translation: Translation
+export interface Handler {
+    handle(payload?: any): Promise<any>
 }

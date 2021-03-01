@@ -30,7 +30,7 @@
     "scripts": {
         "build": "tsc",
         "dev": "tsc -w",
-        "test": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/command.test.ts' --exit",
+        "test": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/event.test.ts' --exit",
         "test:db": "ts-node ./test/migrate.ts --dir ./test/tsconfig.json"
     },
     "bugs": {

@@ -37,7 +37,7 @@ export class BaseProvider extends Provider {
         const config = this.app.resolve(Config)
 
         const translation = new Translation({
-            locale: config.get('locale'),
+            locale: config.get('locale', 'en'),
             dirs: [process.cwd() + '/locales']
         })
 

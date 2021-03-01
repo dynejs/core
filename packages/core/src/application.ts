@@ -1,5 +1,4 @@
 import * as path from 'path'
-import * as express from 'express'
 import { Server as HttpServer } from 'http'
 import { BaseProvider } from './internal/base'
 import { Constructable, Middleware } from './types'
@@ -12,13 +11,11 @@ export class App extends Container {
 
     registeredProviders: Provider[]
     opts: any
-    hooks: (() => void)[]
     cliHooks: ((app: App) => void)[]
 
     constructor(providers: Constructable[] = []) {
         super()
 
-        this.hooks = []
         this.cliHooks = []
         this.registeredProviders = []
         this.opts = {
@@ -38,10 +35,10 @@ export class App extends Container {
         })
     }
 
-    async bootRegisteredProviders() {
+    bootRegisteredProviders() {
         for(const provider of this.registeredProviders) {
             if (provider.boot) {
-                await provider.boot()
+                provider.boot()
             }
         }
     }
@@ -57,28 +54,20 @@ export class App extends Container {
     }
 
     boot() {
-        this.bootRegisteredProviders().then(() => {
-            this.resolve(Router).bind()
-            // Run hooks
-            this.hooks.map(fn => fn())
-            this.cliHooks.map(fn => fn(this))
-        })
+        this.bootRegisteredProviders()
+
+        this.resolve(Router).bind()
+
+        // Run cli hooks
+        this.cliHooks.map(fn => fn(this))
     }
 
     cli(callback: () => void) {
         this.cliHooks.push(callback)
     }
 
-    afterBoot(fn) {
-        this.hooks.push(fn)
-    }
-
     static(route: string, path?: string) {
         this.resolve(Router).static(route, path)
-    }
-
-    staticMiddleware(...args) {
-        return express.static.apply(null, args)
     }
 
     basePath(given) {
@@ -113,6 +102,5 @@ export class App extends Container {
         })
 
         server.listen(port)
-
     }
 }

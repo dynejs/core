@@ -1,13 +1,29 @@
 import * as assert from 'assert'
 import * as fs from 'fs'
 import * as path from 'path'
-import { Config, container } from '@dynejs/core'
+import { Container } from '@dynejs/core'
 import { Image } from '../src'
 
-container.register(Config)
-container.register(Image)
+const container = new Container()
 
-const image = container.resolve(Image)
+let image: Image
+
+before(() => {
+    container.registerFn(Image, () => {
+        return new Image({
+            baseDir: __dirname + '/images',
+            url: '/storage/:size/:name',
+            sizes: {
+                large: {
+                    width: 600,
+                    height: 600
+                }
+            }
+        })
+    })
+
+    image = container.resolve(Image)
+})
 
 describe('Image', () => {
     it('should resize an image', async () => {

@@ -1,13 +1,27 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import assert = require('assert')
-import { Config, container } from '@dynejs/core'
-import { Mailer } from '../dist'
+import { Container, Config } from '@dynejs/core'
+import { Mailer } from '../src'
 
-container.register(Config)
-container.register(Mailer)
+const container = new Container()
 
-const mailer = container.resolve(Mailer)
+let mailer: Mailer
+
+before(() => {
+    container.register(Config)
+    const config = container.resolve(Config)
+
+    container.registerFn(Mailer, () => {
+        return new Mailer({
+            url: config.get('url', null),
+        ...config.get('mail', {})
+        })
+    })
+
+    mailer = container.resolve(Mailer)
+})
+
 
 const html = `
 <style>

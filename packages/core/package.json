@@ -18,6 +18,7 @@
         "minimist": "^1.2.5",
         "morgan": "^1.10.0",
         "multer": "^1.4.2",
+        "nyc": "^15.1.0",
         "reflect-metadata": "^0.1.13",
         "session-file-store": "^1.4.0",
         "slug": "^2.1.1",
@@ -30,7 +31,9 @@
     "scripts": {
         "build": "tsc",
         "dev": "tsc -w",
-        "test": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/*.test.ts' --exit"
+        "test": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/*.test.ts' --exit",
+        "test-cache": "cross-env NODE_ENV=test mocha --require ts-node/register 'test/cache.test.ts' --exit",
+        "nyc": "nyc npm run test"
     },
     "bugs": {
         "url": "https://github.com/dynejs/core/issues",

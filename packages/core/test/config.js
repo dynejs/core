@@ -4,6 +4,10 @@ module.exports = {
         filename: './test.db'
     },
 
+    cache: {
+        dir: __dirname + '/cache'
+    },
+
     service: {
         other: 'Keep this',
         key: 'aValue'

@@ -1,10 +1,10 @@
 {
     "name": "@dynejs/mail",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "main": "./dist/index.js",
     "dependencies": {
-        "nodemailer": "^6.4.16",
-        "inline-css": "^3.0.0"
+        "inline-css": "^3.0.0",
+        "nodemailer": "^6.4.16"
     },
     "peerDependencies": {
         "@dynejs/core": "0.1.x"

@@ -11,12 +11,9 @@ export class App extends Container {
 
     registeredProviders: Provider[]
     opts: any
-    cliHooks: ((app: App) => void)[]
 
     constructor(providers: Constructable[] = []) {
         super()
-
-        this.cliHooks = []
         this.registeredProviders = []
         this.opts = {
             root: process.cwd()
@@ -55,15 +52,19 @@ export class App extends Container {
 
     boot() {
         this.bootRegisteredProviders()
-
         this.resolve(Router).bind()
-
-        // Run cli hooks
-        this.cliHooks.map(fn => fn(this))
     }
 
-    cli(callback: () => void) {
-        this.cliHooks.push(callback)
+    cli() {
+        const command = this.resolve(Command)
+        command
+            .run()
+            .then(() => {
+                process.exit(0)
+            })
+            .catch(() => {
+                process.exit(0)
+            })
     }
 
     static(route: string, path?: string) {

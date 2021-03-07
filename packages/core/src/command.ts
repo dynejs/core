@@ -36,7 +36,7 @@ export class Command {
         return command
     }
 
-    run(args): Promise<any> {
+    run(args?): Promise<any> {
         args = args ? args.split(' ') : process.argv.slice(2)
         const parsed = minimist(args)
 

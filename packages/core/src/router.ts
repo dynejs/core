@@ -91,8 +91,15 @@ export class Router {
 
     controller(cls: Constructable) {
         const routes = Reflect.getMetadata('dy:routes', cls) || []
+        this.container.register(cls)
         const mapped = routes.map(route => {
             const resolved = this.container.resolve(route.cls)
+            // If multiple routes applied to the same function
+            // the route handler will become a function which bounded
+            // to the class
+            if (typeof route.handler === 'function') {
+                route.handler = route.handler.name
+            }
             route.handler = resolved[route.handler].bind(resolved)
             return route
         })

@@ -87,7 +87,7 @@ export class App extends Container {
         this.resolve(Command).register(command)
     }
 
-    listen(opts: any = {}) {
+    listen(opts: any = {}): Promise<HttpServer> {
         const app = this.resolve(Router).getApp()
         app.set('port', opts.port || 3000)
 
@@ -97,11 +97,12 @@ export class App extends Container {
         server.on('error', err => {
             throw err
         })
-
-        server.on('listening', () => {
-            console.log('Listening on port:' + port)
-        })
-
         server.listen(port)
+        return new Promise((resolve) => {
+            server.on('listening', () => {
+                console.log('Listening on port:' + port)
+                resolve(server)
+            })
+        })
     }
 }

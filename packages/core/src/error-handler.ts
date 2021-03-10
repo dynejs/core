@@ -42,6 +42,7 @@ export function errorHandler() {
             return res.render('404')
         }
 
+        res.status(err.code)
         res.render('error', {
             error: err,
             isDevelopment: process.env.NODE_ENV

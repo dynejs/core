@@ -1,6 +1,6 @@
 {
     "name": "@dynejs/core",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "main": "./dist/index.js",
     "dependencies": {
         "bcryptjs": "^2.4.3",

@@ -97,10 +97,9 @@ export class Router {
             // If multiple routes applied to the same function
             // the route handler will become a function which bounded
             // to the class
-            if (typeof route.handler === 'function') {
-                route.handler = route.handler.name
+            if (typeof route.handler !== 'function') {
+                route.handler = resolved[route.handler].bind(resolved)
             }
-            route.handler = resolved[route.handler].bind(resolved)
             return route
         })
         this.routes = this.routes.concat(mapped)

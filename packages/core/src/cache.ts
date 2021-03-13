@@ -86,15 +86,20 @@ export class Cache {
         return Math.floor(expiry.getTime() / 1000)
     }
 
-    private flushFile(file): Promise<void> {
-        return new Promise((resolve, reject) => {
-            if (path.extname(file) !== '') {
-                return resolve()
+    private async flushFile(file): Promise<void> {
+        if (path.extname(file) !== '') {
+            return Promise.resolve()
+        }
+        const p = path.join(this.dir, file)
+        try {
+            const stat = await fs.promises.stat(p)
+            if (stat) {
+                await fs.promises.unlink(p)
             }
-            fs.unlink(path.join(this.dir, file), (err) => {
-                if (err) return reject(err)
-                resolve()
-            })
-        })
+        } catch (err) {
+            if (err.code !== 'ENOENT') {
+                throw err
+            }
+        }
     }
 }

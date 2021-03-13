@@ -27,6 +27,7 @@ describe('Cache', () => {
         })
         assert(value === 'value')
         await cache.flush('some')
+        await cache.flush('not-exists')
         const final = await cache.get('some')
         assert(final === null)
     })

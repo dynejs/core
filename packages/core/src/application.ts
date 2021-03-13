@@ -19,6 +19,7 @@ export class App extends Container {
             root: process.cwd()
         }
 
+        Container.setInstance(this)
         this.registerBaseProviders(providers)
 
         this.boot()

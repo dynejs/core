@@ -18,9 +18,9 @@ export interface BindingOptions<T> {
 export type Callback = (resolved: any) => any
 
 export class Container {
-    services: Map<string, Binding<any>>
 
-    //hooks: Map<string, Callback[]>
+    services: Map<string, Binding<any>>
+    static instance: Container
 
     constructor() {
         this.services = new Map()
@@ -33,6 +33,14 @@ export class Container {
             resolved: true,
             deps: []
         })
+    }
+
+    static setInstance(instance) {
+        this.instance = instance
+    }
+
+    static getInstance() {
+        return this.instance
     }
 
     registerMany(services: Constructable<any>[]) {

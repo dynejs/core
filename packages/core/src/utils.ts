@@ -4,10 +4,25 @@ import tinydate = require('tinydate')
 import slugify = require('slug')
 import path = require('path')
 import fs = require('fs')
+import { Container } from './container'
+import { Constructable } from './types'
+import { Config } from './config'
 
 export function isClass(cls) {
     return typeof cls === 'function'
         && cls.toString().substr(0, 5).toLowerCase() === 'class'
+}
+
+export function app() {
+    return Container.getInstance()
+}
+
+export function resolve<T>(cls: Constructable<T>): T {
+    return Container.getInstance().resolve(cls)
+}
+
+export function config(key: string, def?: any): any {
+    return resolve(Config).get(key, def)
 }
 
 export function asyncWrap(fn) {

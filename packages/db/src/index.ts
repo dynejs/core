@@ -8,7 +8,8 @@ export {
     PaginatedResult,
     QueryOptions,
     QueryConditions,
-    QueryModifier
+    QueryModifier,
+    QueryBuilder
 } from './types/repo'
 
 export {

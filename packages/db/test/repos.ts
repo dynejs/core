@@ -1,78 +1,61 @@
-import { belongsTo, belongsToMany, hasMany, hasOne, Repo } from '../src'
+import { Repo } from '../src'
 
-export interface IUser {
-    name: string
-    email: string
+export class User extends Repo {
+    static table = 'users'
+
+    static relations() {
+        return {
+            address: this.hasOne(Address, 'user_id')
+        }
+    }
 }
 
-export const User = new Repo({
-    table: 'users',
+export class Category extends Repo {
+    static table = 'categories'
 
-    relations() {
+    static relations() {
         return {
-            address: hasOne(Address, 'user_id')
+            photo: this.hasOne(Photo, 'category_id')
         }
     }
-})
-
-export const Category = new Repo({
-    table: 'categories',
-
-    relations() {
-        return {
-            photo: hasOne(Photo, 'category_id')
-        }
-    }
-})
-
-export const Comment = new Repo({
-    table: 'comments',
-
-    relations() {
-        return {
-            author: belongsTo(User, 'author_id')
-        }
-    }
-})
-
-export const CategoryPost = new Repo({
-    table: 'category_post',
-})
-
-export const Photo = new Repo({
-    table: 'photos',
-})
-
-export const Address = new Repo({
-    table: 'addresses',
-
-    relations() {
-        return {
-            user: belongsTo(User, 'user_id')
-        }
-    }
-})
-
-export interface IPost {
-    id: number
-    title: string
-    metadata: string
-    published: boolean
-    content: string
-    author: IUser
-    author_id: number | string
-    comments: any[]
-    categories: any[]
 }
 
-export const Post = new Repo<IPost>({
-    table: 'posts',
+export class Comment extends Repo {
+    static table = 'comments'
 
-    relations() {
+    static relations() {
         return {
-            author: belongsTo(User, 'author_id'),
-            comments: hasMany(Comment, 'post_id'),
-            categories: belongsToMany(Category, 'post_id', 'category_id', 'category_post')
+            author: this.belongsTo(User, 'author_id')
         }
     }
-})
+}
+
+export class CategoryPost extends Repo {
+    static table = 'category_post'
+}
+
+export class Photo extends Repo {
+    static table = 'photos'
+}
+
+export class Address extends Repo {
+    static table = 'addresses'
+
+    static relations() {
+        return {
+            user: this.belongsTo(User, 'user_id')
+        }
+    }
+}
+
+export class Post extends Repo {
+    static table = 'posts'
+
+    static relations() {
+        return {
+            author: this.belongsTo(User, 'author_id'),
+            comments: this.hasMany(Comment, 'post_id'),
+            categories: this.belongsToMany(Category, 'post_id', 'category_id', 'category_post')
+        }
+    }
+}

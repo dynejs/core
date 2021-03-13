@@ -2,7 +2,7 @@ import * as Knex from 'knex'
 import { RelationBuilderApi, RelationMetadata } from '../types/relation'
 import { Repo } from '../repo'
 
-export function belongsTo(repo: Repo, meta: RelationMetadata): RelationBuilderApi {
+export function belongsTo(repo: typeof Repo, meta: RelationMetadata): RelationBuilderApi {
     return {
         buildQuery(result, query: Knex.QueryBuilder) {
             const whereIds = result.map(item => item[meta.localKey]) as string[]

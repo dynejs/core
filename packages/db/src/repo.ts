@@ -1,45 +1,75 @@
 import { QueryBuilder } from 'knex'
 import { findSiblings, findTop } from './utils'
 import { activeConnection } from './connection'
-import { Data, Model, PaginatedResult, QueryOptions } from './types/repo'
+import { Data, PaginatedResult, QueryOptions } from './types/repo'
 import { Relation } from './types/relation'
+import { relation } from './relations/relation'
 
-export interface ModelLike {
-    id?: string | number
-    updated_at?: Date
-    created_at?: Date
-}
+export abstract class Repo {
 
-export class Repo<T extends ModelLike = any> {
+    static table: string
 
-    model: Model
-
-    constructor(model: Model) {
-        this.model = model
-    }
-
-    boot(builder) {
-        if (!this.model.boot) {
+    static $boot(builder) {
+        if (!this.boot) {
             return
         }
-        this.model.boot(builder, this.getConnection())
+        this.boot(builder, this.getConnection())
     }
 
-    getConnection() {
+    static boot(builder, connection?) {
+
+    }
+
+    static transform(attr) {
+        return attr
+    }
+
+    static format(attr) {
+        return attr
+    }
+
+    static relations() {
+        return {}
+    }
+
+    static getConnection() {
         return activeConnection
     }
 
-    $getTable() {
-        return this.model.table
+    static $getTable() {
+        return this.table
     }
 
-    changeQuery(builder: QueryBuilder, query: QueryOptions<T>) {
+    static hasMany(model: typeof Repo, foreignKey: string) {
+        return relation(model, {foreignKey, localKey: 'id', type: 'has-many'})
+    }
+
+    static hasOne(model: typeof Repo, foreignKey: string) {
+        return relation(model, {localKey: 'id', foreignKey, type: 'has-one'})
+    }
+
+    static belongsTo(model: typeof Repo, localKey: string) {
+        return relation(model, {localKey, foreignKey: 'id', type: 'belongs-to'})
+    }
+
+    static belongsToMany(model: typeof Repo, localKey: string, foreignKey: string, joinTable: string) {
+        return relation(model, {
+            localKey: 'id',
+            foreignKey: 'id',
+            localJoin: localKey,
+            foreignJoin: foreignKey,
+            joinTable,
+            type: 'belongs-to-many'
+        })
+    }
+
+    static changeQuery(builder: QueryBuilder, query: QueryOptions<any>) {
         if (query && typeof query === 'object') {
             this.buildWhere(builder, query)
         }
     }
 
-    buildWhere(query, params) {
+    static buildWhere(query, params) {
         if (params && typeof params !== 'object') {
             throw new Error('Query parameters must be an object')
         }
@@ -51,14 +81,14 @@ export class Repo<T extends ModelLike = any> {
         }
     }
 
-    getBuilder(): QueryBuilder {
-        if (!this.model.table) {
+    static getBuilder(): QueryBuilder {
+        if (!this.table) {
             throw new Error(`Table is not defined`)
         }
-        return this.getConnection()(this.model.table)
+        return this.getConnection()(this.table)
     }
 
-    getBuilderFromQuery(query: QueryOptions<any>) {
+    static getBuilderFromQuery(query: QueryOptions<any>) {
         let builder
 
         if (query && query.constructor && query.constructor.name === 'Builder') {
@@ -73,7 +103,7 @@ export class Repo<T extends ModelLike = any> {
         return builder
     }
 
-    async loadRelations(preload: string[], result: Data[]) {
+    static async loadRelations(preload: string[], result: Data[]) {
         if (preload) {
             const topRelations = findTop(preload)
             const promises = topRelations.map(relation => {
@@ -85,59 +115,53 @@ export class Repo<T extends ModelLike = any> {
         }
     }
 
-    getRelation(name: string): Relation {
-        const rel = this.model.relations()[name]
+    static getRelation(name: string): Relation {
+        const rel = this.relations()[name]
 
         if (!rel) {
-            throw new Error(`Relation "${name}" not found in ${this.model.name}.`)
+            throw new Error(`Relation "${name}" not found in ${this.name}.`)
         }
 
         return rel
     }
 
-    $format(result): any {
+    static $format(result): any {
         if (!result) {
             return null
         }
-        if (this.model.format) {
-            if (Array.isArray(result)) {
-                return result.map(r => {
-                    return this.model.format(r)
-                })
-            }
-            return this.model.format(result)
+        if (Array.isArray(result)) {
+            return result.map(r => {
+                return this.format(r)
+            })
         }
-        return result
+        return this.format(result)
     }
 
-    $transform(attr) {
-        if (this.model.transform) {
-            return this.model.transform(attr)
-        }
-        return attr
+    static $transform(attr) {
+        return this.transform(attr)
     }
 
-    async rawGet(query?: QueryOptions<T>, preload?: string[]): Promise<Data[]> {
+    static async rawGet(query?: QueryOptions<any>, preload?: string[]): Promise<Data[]> {
         const builder = this.getBuilderFromQuery(query)
 
-        this.boot(builder)
+        this.$boot(builder)
 
         const result = await builder
         await this.loadRelations(preload, result)
         return result
     }
 
-    async get(query?: QueryOptions<T>, preload?: string[]): Promise<T[]> {
+    static async get(query?: QueryOptions<any>, preload?: string[]): Promise<any[]> {
         let result = await this.rawGet(query, preload)
         return result.map(item => this.$format(item))
     }
 
-    async find(query?: QueryOptions<T>, preload?: string[]): Promise<T> {
+    static async find(query?: QueryOptions<any>, preload?: string[]): Promise<any> {
         const res = await this.get(query, preload)
         return res.shift()
     }
 
-    async create(attr: Partial<T>): Promise<any> {
+    static async create(attr: Partial<any>): Promise<any> {
         const builder = this.getBuilder()
 
         attr = this.$transform(attr) as any
@@ -153,7 +177,7 @@ export class Repo<T extends ModelLike = any> {
         return attr
     }
 
-    async update(query: QueryOptions<T>, attr: Partial<T>): Promise<any> {
+    static async update(query: QueryOptions<any>, attr: Partial<any>): Promise<any> {
         const builder = this.getBuilder()
         this.changeQuery(builder, query)
         attr = this.$transform(attr)
@@ -164,14 +188,14 @@ export class Repo<T extends ModelLike = any> {
         return attr
     }
 
-    async save(attr) {
+    static async save(attr) {
         if (attr.id) {
             return this.update({id: attr.id} as any, attr)
         }
         return this.create(attr)
     }
 
-    async saveMany(attrs) {
+    static async saveMany(attrs) {
         const promises = attrs.map(attr => {
             // A transforming applied here also
             // as id or other attributes may change during transform
@@ -184,14 +208,14 @@ export class Repo<T extends ModelLike = any> {
         return Promise.all(promises)
     }
 
-    async destroy(query) {
+    static async destroy(query) {
         const builder = this.getBuilder()
         this.changeQuery(builder, query)
         const deleted = await builder.delete()
         return deleted !== 0
     }
 
-    async paginate(size: number, offset: number | string, query?: QueryOptions<T>, preload?: string[]): Promise<PaginatedResult<T>> {
+    static async paginate(size: number, offset: number | string, query?: QueryOptions<any>, preload?: string[]): Promise<PaginatedResult<any>> {
         offset = Number(offset)
 
         const builder = this.getBuilderFromQuery(query)
@@ -213,7 +237,7 @@ export class Repo<T extends ModelLike = any> {
         }
     }
 
-    async sync(props) {
+    static async sync(props) {
         const builder = this.getBuilder()
 
         let localKey = null

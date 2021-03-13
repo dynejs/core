@@ -2,7 +2,7 @@ import { QueryBuilder } from 'knex'
 import { RelationBuilderApi, RelationMetadata } from '../types/relation'
 import { Repo } from '../repo'
 
-export function hasOne(repo: Repo, meta: RelationMetadata): RelationBuilderApi {
+export function hasOne(repo: typeof Repo, meta: RelationMetadata): RelationBuilderApi {
     return {
         buildQuery(result, query: QueryBuilder) {
             const whereIds = result.map(item => item[meta.localKey]) as string[]

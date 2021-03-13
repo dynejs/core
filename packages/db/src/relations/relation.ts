@@ -13,7 +13,7 @@ const builders = {
     'belongs-to-many': belongsToMany
 }
 
-export function relation(model: Repo, meta: RelationMetadata) {
+export function relation(model: typeof Repo, meta: RelationMetadata) {
     const relationBuilder: RelationBuilderApi = builders[meta.type](model, meta)
 
     return async function build(field: string, result: Data[], preload?: string[]) {

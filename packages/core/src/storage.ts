@@ -1,13 +1,10 @@
 import fs = require('fs')
 import path = require('path')
 import multer = require('multer')
+import { config } from './utils'
 
 export const storage = {
-    root: process.cwd(),
-
     store(dir: string) {
-        dir = path.join(this.root, dir)
-
         const uploader = getUploader(dir)
         const exists = fs.existsSync(dir)
 
@@ -18,13 +15,15 @@ export const storage = {
     },
 
     remove(filePath: string) {
-        fs.unlinkSync(path.join(this.root, filePath))
+        const root = config('root')
+        fs.unlinkSync(path.join(root, filePath))
     }
 }
 
 function getUploader(dir) {
     const diskStorage = multer.diskStorage({
         destination: (req, file, cb) => {
+            dir = path.join(config('root'), dir)
             cb(null, dir)
         },
         async filename(req, file, cb) {

@@ -1,5 +1,5 @@
-import { Request, Response } from './types'
-import { ErrorClient } from './exception'
+import { Request, Response } from '../types'
+import { ErrorClient } from '../exception'
 
 export function notFoundHandler() {
     return function notFoundHandler(req: Request, res: Response) {

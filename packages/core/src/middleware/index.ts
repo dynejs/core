@@ -1,2 +1,5 @@
+export { errorHandler, notFoundHandler } from './error-handler'
+export { setBasePath } from './set-base-path'
 export { setBasicLocals } from './set-basic-locals'
+export { setIsJson } from './set-is-json'
 export { vendor } from './vendor'

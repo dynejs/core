@@ -9,7 +9,7 @@ export { IRouter } from 'express'
 // Common
 export { storage } from './storage'
 export { Config } from './config'
-export { Views } from './views/views'
+export { Views } from './views'
 export { Cache } from './cache'
 export { Provider } from './provider'
 export { Command } from './command'
@@ -24,8 +24,6 @@ export { Controller, Get, Post, Put, Delete } from './decorators/controller'
 export { CommandHandler } from './decorators/command-handler'
 export { Listener } from './decorators/listener'
 
-// Support
-export { errorHandler, notFoundHandler } from './error-handler'
 export {
     createToken,
     autoload,

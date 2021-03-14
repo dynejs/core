@@ -1,17 +1,14 @@
 import * as express from 'express'
+import { Express, IRouter } from 'express'
 import * as hbs from 'hbs'
 import * as methods from 'methods'
-import _debug = require('debug')
-import { Express, IRouter } from 'express'
 import { Constructable, Middleware } from './types'
 import { Container } from './container'
 import { Injectable } from './decorators/injectable'
-import { Views } from './views/views'
+import { Views } from './views'
 import { asyncWrap, isClass } from './utils'
-import { vendor } from './middleware'
-import { setRenderPage } from './middleware/set-render-page'
-import { setIsJson } from './middleware/set-is-json'
-import { errorHandler } from './error-handler'
+import { errorHandler, setBasePath, setBasicLocals, setIsJson, vendor } from './middleware'
+import _debug = require('debug')
 
 const debug = _debug('dyne:core:router')
 
@@ -126,7 +123,8 @@ export class Router {
         // Core middleware functions
         this.app.use(vendor())
         this.app.use(setIsJson())
-        this.app.use(setRenderPage())
+        this.app.use(setBasicLocals())
+        this.app.use(setBasePath())
 
         // Bind middleware functions
         this.middleware.forEach(middleware => {

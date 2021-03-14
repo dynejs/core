@@ -1,7 +1,6 @@
 import fs = require('fs')
 import path = require('path')
 import hbs = require('hbs')
-import * as themeHelpers from './helpers'
 
 export class Views {
     views: string[]
@@ -14,7 +13,6 @@ export class Views {
         this.views = []
         this.hooks = new Map()
         this.cache = new Map()
-        this.loadHelpers()
     }
 
     /**
@@ -22,15 +20,6 @@ export class Views {
      */
     get() {
         return this.views
-    }
-
-    /**
-     * Register base template helpers
-     */
-    loadHelpers() {
-        Object.keys(themeHelpers).map(key => {
-            hbs.registerHelper(key, themeHelpers[key]({hbs}))
-        })
     }
 
     /**

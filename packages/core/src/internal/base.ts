@@ -1,10 +1,9 @@
-import { Views } from '../views/views'
+import { Views } from '../views'
 import { Config } from '../config'
 import { Command } from '../command'
 import { Router } from '../router'
 import { Cache } from '../cache'
 import { Provider } from '../provider'
-import { setBasePath } from '../middleware/set-base-path'
 import { Event } from '../event'
 import { Dispatcher } from '../dispatcher'
 import { Translation } from '../translation'
@@ -29,8 +28,6 @@ export class BaseProvider extends Provider {
 
     boot() {
         this.views.add(this.app.basePath('views'))
-
-        this.app.use(setBasePath())
     }
 
     registerTranslation() {

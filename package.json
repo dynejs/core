@@ -21,9 +21,7 @@
         "yargs": "^16.2.0"
     },
     "scripts": {
-        "clean": "node ./scripts/clean.js",
         "version": "lerna version --no-git-tag-version",
-        "doc": "ts-node scripts/doc.ts"
     },
     "bugs": {
         "url": "https://github.com/dynejs/core/issues",
